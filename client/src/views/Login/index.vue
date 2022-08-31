@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import Register from './components/register.vue';
 import Login from './components/login.vue';
 import '@/assets/style/login.less'
@@ -30,6 +30,7 @@ import { useRouter } from 'vue-router';
 
 
 const router = useRouter()
+let timer = null
 
 const slideContainerState = ref(false)
 
@@ -37,31 +38,46 @@ const loginUser = async (v) => {
     const { data, msg } = await userLogin(v)
     localStorage.setItem('token', data)
     ElMessage.success(msg)
-    router.replace({
-        name: 'home',
-        // query: {
-        //     username: v.username
-        // },
-        params: {
-            username: v.username
-        }
-    })
+    timer = setTimeout(() => {
+        router.replace({
+            name: 'home',
+            query: {
+                username: v.username
+            },
+            params: {
+                username: v.username
+            }
+        })
+        timer = null
+        clearTimeout(timer)
+    }, 500)
+
+
 }
 const registerUser = async (v) => {
     const { msg } = await userRegister(v)
     ElMessage.success(msg)
     // 注册完成直接登录 
-    router.replace({
-        name: 'home',
-        query: {
-            username: v.username
-        },
-        params: {
-            username: v.username
-        }
-    })
+    loginUser(v)
+    timer = setTimeout(() => {
+        router.replace({
+            name: 'home',
+            query: {
+                username: v.username
+            },
+            params: {
+                username: v.username
+            }
+        })
+        timer = null
+        clearTimeout(timer)
+    }, 500)
 }
 
+onBeforeMount(() => {
+    timer = null
+    clearTimeout(timer)
+})
 
 
 </script>
