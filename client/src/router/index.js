@@ -16,7 +16,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/home',
+      path: '/home/:username',
       name: 'home',
       component: () => import('@/views/Home/Home.vue'),
 
@@ -30,7 +30,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 动态title
   document.title = to.meta.title
-  next()
+  // 非跳转登录页并且没有登录,强制跳转login
+  const re = localStorage.getItem('token')
+  if (to.fullPath != '/login' && !re) {
+    next('/login')
+  } else next()
 })
 
 export default router
