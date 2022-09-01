@@ -10,7 +10,10 @@
         </fieldset>
         <fieldset>
             <legend>系统操作</legend>
-            <p><button style="padding: 5px 10px;" @click="logout">下线</button></p>
+            <p>
+                <el-button @click="logout">下线</el-button>
+                <el-button @click="delAccount">注销</el-button>
+            </p>
         </fieldset>
     </div>
 </template>
@@ -23,6 +26,13 @@ const router = useRouter()
 
 // 下线
 const logout = () => {
+    localStorage.removeItem('token')
+    router.replace('/login')
+}
+const delAccount = () => {
+    // delete请求后端删除当前用户
+    
+
     localStorage.removeItem('token')
     router.replace('/login')
 }

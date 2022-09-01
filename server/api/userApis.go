@@ -4,15 +4,23 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	"strconv"
 
 	"akexc.com/vueginlr-server/model"
 	"akexc.com/vueginlr-server/util"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
 // var db = model.GetDb()
+
+type userDto struct {
+	Username  string
+	Nickname string
+	State int
+	Phone string
+	Email string
+	Address string
+}
 
 func Register(ctx *gin.Context) {
 	var user model.User
@@ -42,7 +50,7 @@ func Login(ctx *gin.Context) {
 		db.Where("username = ? ", user.Username).First(&user)
 		fmt.Println(password, user.Password)
 		if util.ComparePwd(user.Password, password) {
-			token, _ := CreateToken(&user, "secret64h")
+			token, _ := util.ReleaseToken(user)
 			util.Response(ctx, http.StatusOK, 2000, token, "登录成功")
 		} else {
 			util.Response(ctx, http.StatusBadRequest, 4000, nil, "用户名或密码错误")
@@ -52,6 +60,123 @@ func Login(ctx *gin.Context) {
 	} else {
 		util.Response(ctx, http.StatusBadRequest, 4000, nil, "用户不存在")
 	}
+}
+
+// EditUser api/v1/user/:id
+func EditUser(ctx *gin.Context) {
+	var user userDto
+	err := ctx.Bind(&user)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	id := ctx.Param("id")
+	db := model.GetDb()
+
+	if !checkUserExistById(id){
+		ctx.JSON(400,gin.H{
+			"code":4000,
+			"msg":"用户不存在",
+		})
+		return
+	}
+	// 根据 `struct` 更新属性，只会更新非零值的字段
+	db.Model(model.User{}).Where("id = ?",id).Updates(user)
+	// UPDATE users SET name='hello', age=18, updated_at = '2013-11-17 21:34:10' WHERE id = 111;
+	ctx.JSON(200,gin.H{
+		"code":"2000",
+		"msg":"用户信息更新成功",
+		"data":user,
+	})
+
+}
+
+// DelUser api/v1/user/:id
+func DelUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	db := model.GetDb()
+
+	if !checkUserExistById(id){
+		ctx.JSON(400,gin.H{
+			"code":4000,
+			"msg":"用户不存在",
+		})
+		return
+	}
+	db.Where("id = ?",id).Delete(&model.User{})
+	ctx.JSON(200,gin.H{
+		"code":"2000",
+		"msg":"用户已删除",
+		"data":nil,
+	})
+
+}
+func GetUserById(ctx *gin.Context) {
+	var user model.User
+
+	id := ctx.Param("id")
+	db := model.GetDb()
+
+	if !checkUserExistById(id){
+		ctx.JSON(400,gin.H{
+			"code":4000,
+			"msg":"用户不存在",
+		})
+		return
+	}
+	db.First(&user,id)
+	ctx.JSON(200,gin.H{
+		"code":"2000",
+		"msg":"用户信息获取成成功",
+		"data":user,
+	})
+
+}
+
+
+func GetAllUser(ctx *gin.Context)  {
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pagNum","0"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize","5"))
+	var users []model.User
+	db := model.GetDb()
+	// 返回分页用户列表数据
+	userList := make([]interface{}, 0, len(users))
+	// 计算偏移量
+	offset := (pageNum - 1) * pageSize
+	// 查询所有的user
+	result := db.Offset(offset).Limit(pageSize).Find(&users)
+	// 查不到数据时
+	if result.RowsAffected == 0{
+		ctx.JSON(200,gin.H{
+			"code":"2000",
+			"msg":"无数据",
+			"total":0,
+			"data":nil,
+		})
+		return
+	}
+	// 获取user总数
+	total := len(users)
+	// 查询数据
+	result.Offset(offset).Limit(pageSize).Find(&users)
+	for _, v := range users {
+		userItem := map[string]interface{}{
+			"id":        v.ID,
+			"nickname": v.Nickname,
+			"address":   v.Address,
+			"state":      v.State,
+			"email":   v.Email,
+			"username":v.Username,
+			"mobile":    v.Phone,
+		}
+		userList = append(userList, userItem)
+	}
+	ctx.JSON(200,gin.H{
+		"code":"2000",
+		"msg":"用户列表获取成功",
+		"total":total,
+		"data":userList,
+	})
 }
 
 // checkUserExist 根据用户名查询用户是否存在
@@ -69,16 +194,17 @@ func checkUserExist(name string) bool {
 
 }
 
-func CreateToken(info *model.User, secret string) (tokenString string, err error) {
-	//传入指定的签名方法和payload信息,创建Token对象
-	//库中内置了好几种签名方法
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       info.ID,
-		"username": info.Username,
-		"nbf":      time.Now().Unix(),
-		"iat":      time.Now().Unix(),
-	})
-	//根据密码生成token字符串
-	tokenString, err = token.SignedString([]byte(secret))
-	return tokenString, err
+func checkUserExistById(id string) bool {
+	var user model.User
+	db := model.GetDb()
+	db.Where("id = ?", id).First(&user)
+
+	if user.ID > 0 {
+		return true
+	} else {
+		return false
+
+	}
+
 }
+

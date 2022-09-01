@@ -17,6 +17,7 @@ func InitRouter() *gin.Engine {
 	// 静态资源服务
 	r.Static("/assets", "./assets")
 
+	// test connect
 	r.GET("ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"code": 2000,
@@ -24,8 +25,19 @@ func InitRouter() *gin.Engine {
 			"ip":   ctx.ClientIP(),
 		})
 	})
-	r.POST("api/v1/login", api.Login)
-	r.POST("api/v1/register", api.Register)
+
+
+
+	//用户组
+	v1 := r.Group("api/v1")
+	{
+		// 特殊接口,不需要token严重
+		v1.POST("/login", api.Login)
+		v1.POST("/register", api.Register)
+		GetUserRoutes(v1)
+	}
+
+
 
 	return r
 }
