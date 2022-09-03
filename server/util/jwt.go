@@ -3,6 +3,7 @@ package util
 import (
 	"time"
 
+	"akexc.com/vueginlr-server/common"
 	"akexc.com/vueginlr-server/model"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -10,20 +11,17 @@ import (
 //定义秘钥
 var jwtKey = []byte("akexc-jwt-4396")
 
-type Claims struct {
-	UserId uint
-	jwt.StandardClaims
-}
 //ReleaseToken 发放toke 有效期7天
 func ReleaseToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) //token的有效期是七天
-	claims := &Claims{
+	claims := &common.Claims{
 		UserId: user.ID,
+		Role:   user.State, // 1 ==root,2 == admin, other == user
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(), //token的有效期
-			IssuedAt:  time.Now().Unix(), //token发放的时间
-			Issuer:    "凌天akex", //作者
-			Subject:   "user token", //主题
+			IssuedAt:  time.Now().Unix(),     //token发放的时间
+			Issuer:    "凌天akex",              //作者
+			Subject:   "user token",          //主题
 		},
 	}
 
@@ -39,8 +37,8 @@ func ReleaseToken(user model.User) (string, error) {
 }
 
 // ParseToken 解析token
-func ParseToken(tokenString string) (*jwt.Token, *Claims, error) {
-	claims := &Claims{}
+func ParseToken(tokenString string) (*jwt.Token, *common.Claims, error) {
+	claims := &common.Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})

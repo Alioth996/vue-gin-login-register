@@ -14,12 +14,12 @@ import (
 // var db = model.GetDb()
 
 type userDto struct {
-	Username  string
+	Username string
 	Nickname string
-	State int
-	Phone string
-	Email string
-	Address string
+	State    int
+	Phone    string
+	Email    string
+	Address  string
 }
 
 func Register(ctx *gin.Context) {
@@ -62,7 +62,13 @@ func Login(ctx *gin.Context) {
 	}
 }
 
-// EditUser api/v1/user/:id
+// GetUserInfo 用户获取个人信息
+func GetUserInfo(ctx *gin.Context) {
+	user, _ := ctx.Get("user")
+	util.Success(ctx, user, "用户信息获取成功")
+}
+
+// EditUser  管理员修改用户信息
 func EditUser(ctx *gin.Context) {
 	var user userDto
 	err := ctx.Bind(&user)
@@ -73,70 +79,72 @@ func EditUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	db := model.GetDb()
 
-	if !checkUserExistById(id){
-		ctx.JSON(400,gin.H{
-			"code":4000,
-			"msg":"用户不存在",
+	if !checkUserExistById(id) {
+		ctx.JSON(400, gin.H{
+			"code": 4000,
+			"msg":  "用户不存在",
 		})
 		return
 	}
 	// 根据 `struct` 更新属性，只会更新非零值的字段
-	db.Model(model.User{}).Where("id = ?",id).Updates(user)
+	db.Model(model.User{}).Where("id = ?", id).Updates(user)
 	// UPDATE users SET name='hello', age=18, updated_at = '2013-11-17 21:34:10' WHERE id = 111;
-	ctx.JSON(200,gin.H{
-		"code":"2000",
-		"msg":"用户信息更新成功",
-		"data":user,
+	ctx.JSON(200, gin.H{
+		"code": "2000",
+		"msg":  "用户信息更新成功",
+		"data": user,
 	})
 
 }
 
-// DelUser api/v1/user/:id
+// DelUser root 删除用户
 func DelUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 	db := model.GetDb()
 
-	if !checkUserExistById(id){
-		ctx.JSON(400,gin.H{
-			"code":4000,
-			"msg":"用户不存在",
+	if !checkUserExistById(id) {
+		ctx.JSON(400, gin.H{
+			"code": 4000,
+			"msg":  "用户不存在",
 		})
 		return
 	}
-	db.Where("id = ?",id).Delete(&model.User{})
-	ctx.JSON(200,gin.H{
-		"code":"2000",
-		"msg":"用户已删除",
-		"data":nil,
+	db.Where("id = ?", id).Delete(&model.User{})
+	ctx.JSON(200, gin.H{
+		"code": "2000",
+		"msg":  "用户已删除",
+		"data": nil,
 	})
 
 }
+
+// GetUserById 管理员获取用户信息
 func GetUserById(ctx *gin.Context) {
 	var user model.User
 
 	id := ctx.Param("id")
 	db := model.GetDb()
 
-	if !checkUserExistById(id){
-		ctx.JSON(400,gin.H{
-			"code":4000,
-			"msg":"用户不存在",
+	if !checkUserExistById(id) {
+		ctx.JSON(400, gin.H{
+			"code": 4000,
+			"msg":  "用户不存在",
 		})
 		return
 	}
-	db.First(&user,id)
-	ctx.JSON(200,gin.H{
-		"code":"2000",
-		"msg":"用户信息获取成成功",
-		"data":user,
+	db.First(&user, id)
+	ctx.JSON(200, gin.H{
+		"code": "2000",
+		"msg":  "用户信息获取成成功",
+		"data": user,
 	})
 
 }
 
-
-func GetAllUser(ctx *gin.Context)  {
-	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pagNum","0"))
-	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize","5"))
+// GetAllUser 管理员获取用户列表
+func GetAllUser(ctx *gin.Context) {
+	pageNum, _ := strconv.Atoi(ctx.DefaultQuery("pagNum", "0"))
+	pageSize, _ := strconv.Atoi(ctx.DefaultQuery("pageSize", "5"))
 	var users []model.User
 	db := model.GetDb()
 	// 返回分页用户列表数据
@@ -146,12 +154,12 @@ func GetAllUser(ctx *gin.Context)  {
 	// 查询所有的user
 	result := db.Offset(offset).Limit(pageSize).Find(&users)
 	// 查不到数据时
-	if result.RowsAffected == 0{
-		ctx.JSON(200,gin.H{
-			"code":"2000",
-			"msg":"无数据",
-			"total":0,
-			"data":nil,
+	if result.RowsAffected == 0 {
+		ctx.JSON(200, gin.H{
+			"code":  "2000",
+			"msg":   "无数据",
+			"total": 0,
+			"data":  nil,
 		})
 		return
 	}
@@ -161,21 +169,21 @@ func GetAllUser(ctx *gin.Context)  {
 	result.Offset(offset).Limit(pageSize).Find(&users)
 	for _, v := range users {
 		userItem := map[string]interface{}{
-			"id":        v.ID,
+			"id":       v.ID,
 			"nickname": v.Nickname,
-			"address":   v.Address,
-			"state":      v.State,
-			"email":   v.Email,
-			"username":v.Username,
-			"mobile":    v.Phone,
+			"address":  v.Address,
+			"state":    v.State,
+			"email":    v.Email,
+			"username": v.Username,
+			"mobile":   v.Phone,
 		}
 		userList = append(userList, userItem)
 	}
-	ctx.JSON(200,gin.H{
-		"code":"2000",
-		"msg":"用户列表获取成功",
-		"total":total,
-		"data":userList,
+	ctx.JSON(200, gin.H{
+		"code":  "2000",
+		"msg":   "用户列表获取成功",
+		"total": total,
+		"data":  userList,
 	})
 }
 
@@ -207,4 +215,3 @@ func checkUserExistById(id string) bool {
 	}
 
 }
-
