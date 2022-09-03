@@ -1,5 +1,6 @@
 <template>
     <div></div>
+    <!-- 别再使用404.vue -->
 </template>
 <style scoped>
 div {
