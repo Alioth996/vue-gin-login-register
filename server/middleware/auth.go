@@ -12,7 +12,7 @@ import (
 func AuthMiddleware(c *gin.Context)  {
 		// 获取 authorization header：获取前端传过来的信息的
 		tokenString := c.GetHeader("Authorization")
-
+		//fmt.Println(tokenString)
 		//验证前端传过来的token格式，不为空，开头为Bearer
 		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			c.JSON(401,gin.H{
