@@ -42,13 +42,13 @@ const loginUser = async (v) => {
         router.replace({
             name: 'home',
             // query正常
-            query: {
-                username: v.username
-            },
-            // params: 似乎必须使用动态路由才能传参,不然则为空,知识盲区
-            params: {
-                username: v.username
-            }
+            // query: {
+            //     username: v.username
+            // },
+            // // params: 似乎必须使用动态路由才能传参,不然则为空,知识盲区
+            // params: {
+            //     username: v.username
+            // }
         })
         timer = null
         clearTimeout(timer)
@@ -64,13 +64,13 @@ const registerUser = async (v) => {
     timer = setTimeout(() => {
         router.replace({
             name: 'home',
-            query: {
-                username: v.username
-            },
+            // query: {
+            //     username: v.username
+            // },
 
-            params: {
-                username: v.username
-            }
+            // params: {
+            //     username: v.username
+            // }
         })
         timer = null
         clearTimeout(timer)
