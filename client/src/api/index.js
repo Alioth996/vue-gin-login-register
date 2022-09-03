@@ -9,6 +9,8 @@ instance.interceptors.request.use(
   config => {
     // 在发送请求之前做些什么
     // 加token
+    const token = `Bearer ${localStorage.getItem('token')}` ?? ''
+    config.headers.Authorization = token
     return config
   },
   error => {

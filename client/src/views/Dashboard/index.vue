@@ -1,6 +1,6 @@
 <template>
     <div class="dashboard">
-        <h1>Welcome</h1>
+        <h1>Welcome:</h1>
         <br>
         <p>super amdin</p>
     </div>

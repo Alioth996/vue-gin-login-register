@@ -8,8 +8,8 @@
             </span>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item>logout</el-dropdown-item>
-                    <el-dropdown-item>注销</el-dropdown-item>
+                    <el-dropdown-item @click="logout">logout</el-dropdown-item>
+                    <el-dropdown-item @click="delCurrentUser">注销</el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -18,7 +18,38 @@
 </template>
 
 <script setup>
+import { ElMessageBox } from 'element-plus';
+import { useRouter } from 'vue-router';
+import { delUser } from '@/api/user';
 
+
+const router = useRouter()
+
+let timer = null
+const logout = () => {
+    timer = setTimeout(() => {
+        localStorage.removeItem('token')
+        router.replace('/login')
+    }, 500)
+}
+
+const delCurrentUser = () => {
+    ElMessageBox.confirm('此操作将彻底删除当前用户!!', "警告", {
+        confirmButtonText: '取消',
+        cancelButtonText: '确认注销',
+        type: 'warning',
+        // 区分不同的操作
+        distinguishCancelAndClose: true,
+    }).then(() => {
+        console.log("取消注销");
+    }).catch(async () => {
+        // console.log("取消");
+        // 确认删除
+        // 请求后端
+        const re = await delUser('65')
+        console.log(re);
+    })
+}
 </script>
 
 <style scoped lang='less'>
