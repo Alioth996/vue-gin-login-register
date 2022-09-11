@@ -15,8 +15,9 @@ func GetUserRoutes(g *gin.RouterGroup) {
 		userAuth := user.Group("")
 		userAuth.Use(middleware.AuthMiddleware(common.User))
 		{
+			userAuth.GET("/role",api.GetUserRole)		// 获取用户权限
 			userAuth.GET("/info", api.GetUserInfo)
-			userAuth.PUT("/:id", api.EditUser) // 修改用户个人信息
+			userAuth.PUT("/:id", api.EditUser) 		// 修改用户个人信息
 		}
 		//管理员
 		adminAuth := user.Group("")

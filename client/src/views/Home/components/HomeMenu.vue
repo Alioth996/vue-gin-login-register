@@ -9,7 +9,7 @@
                 <el-menu-item index="1-1">item one</el-menu-item>
                 <el-menu-item index="1-2">item two</el-menu-item>
             </el-sub-menu>
-            <el-menu-item index="/usermange" v-if="role">
+            <el-menu-item index="/usermange" v-if="GET_ROLE != 0">
                 <!-- 超管和管员可见 -->
                 <span>用户管理</span>
             </el-menu-item>
@@ -20,27 +20,16 @@
     </div>
 </template>
 
-<script setup>
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter()
-const role = ref(1)
+<script setup >
+import { userStore } from '@/store/user';
 
-onMounted(() => {
-    pushRoute(role.value)
-})
+console.log("homemenu组件");
 
-// 根据用户角色添加路由
-const pushRoute = (role) => {
-    if (!role) {
-        return
-    }
-    router.addRoute('home', {
-        path: '/usermange',
-        component: () => import('@/views/用户管理/index.vue')
-    })
+const { GET_ROLE } = userStore()
 
-}
+console.log(GET_ROLE);
+
+
 
 const handleOpen = () => {
 

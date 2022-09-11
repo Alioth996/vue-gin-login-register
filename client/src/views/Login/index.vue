@@ -20,20 +20,13 @@
 </template>
 
 <script setup>
-import {onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import Register from './components/register.vue';
 import Login from './components/login.vue';
 import '@/assets/style/login.less'
 import { userLogin, userRegister } from '@/api/user';
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router';
-import { userStore } from '@/store/user'
-
-
-const {uid,token,SET_TOKEN,SET_UID,SET_ROLE,role} = userStore()
-
-
-SET_ROLE(1)
 
 
 const router = useRouter()
@@ -83,9 +76,6 @@ const registerUser = async (v) => {
         clearTimeout(timer)
     }, 500)
 }
-
-// onMounted(()=>console.log(2))
-
 onBeforeUnmount(() => {
     timer = null
     clearTimeout(timer)

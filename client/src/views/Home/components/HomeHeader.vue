@@ -22,15 +22,18 @@ import { ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { delUser } from '@/api/user';
 
+console.log("homeheader组件");
 
 const router = useRouter()
 
 let timer = null
 const logout = () => {
     timer = setTimeout(() => {
-        localStorage.removeItem('token')
+        localStorage.clear()
         router.replace('/login')
     }, 500)
+    timer = null
+    clearTimeout(timer)
 }
 
 const delCurrentUser = () => {

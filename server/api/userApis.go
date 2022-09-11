@@ -68,6 +68,12 @@ func GetUserInfo(ctx *gin.Context) {
 	util.Success(ctx, user, "用户信息获取成功")
 }
 
+// GetUserRole 获取用户权限
+func  GetUserRole(ctx *gin.Context)  {
+	role,_:= ctx.Get("role")
+	util.Success(ctx,gin.H{"role":role},"用户权限获取成功")
+}
+
 // EditUser  管理员修改用户信息
 func EditUser(ctx *gin.Context) {
 	var user userDto
