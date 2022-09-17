@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import Register from './components/register.vue';
 import Login from './components/login.vue';
 import '@/assets/style/login.less'
