@@ -18,7 +18,7 @@ const speakWelcome = (username) => {
     ttsIntance.addEventListener('end', e => console.log('welcome tts end..'))
     ttsIntance.addEventListener('error', e => new Error(e))
     ttsIntance.addEventListener('start', e => console.log("welcome tts start.."))
-    // speechSynthesis.speak(ttsIntance)
+    speechSynthesis.speak(ttsIntance)
 }
 
 onMounted(() => speakWelcome(username))
