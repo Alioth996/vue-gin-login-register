@@ -24,7 +24,6 @@ import { userStore } from "@/store/user";
 import { onMounted } from "vue";
 import { useRouter } from 'vue-router'
 
-console.log("home组件");
 const router = useRouter()
 
 const { SET_ROLE } = userStore()

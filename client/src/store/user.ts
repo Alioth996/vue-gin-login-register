@@ -4,10 +4,12 @@ export const userStore = defineStore('userInfo', {
   state: () => ({
     uid: 0,
     role: 0,
-    token: ''
+    token: '',
+    username: '张三'
   }),
   getters: {
     GET_UID: state => (state.uid ? state.uid : localStorage.getItem('uid')),
+    GET_USERNAME: state => (state.username ? state.username : localStorage.getItem('username')),
     GET_TOKEN: state => (state.token ? state.token : localStorage.getItem('token')),
     GET_ROLE: state => (state.role ? state.role : localStorage.getItem('role'))
   },

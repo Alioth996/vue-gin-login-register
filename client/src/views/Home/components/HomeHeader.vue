@@ -22,7 +22,6 @@ import { ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { delUser } from '@/api/user';
 
-console.log("homeheader组件");
 
 const router = useRouter()
 

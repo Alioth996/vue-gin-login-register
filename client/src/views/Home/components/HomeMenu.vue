@@ -23,7 +23,6 @@
 <script setup >
 import { userStore } from '@/store/user';
 
-console.log("homemenu组件");
 
 const { GET_ROLE } = userStore()
 
